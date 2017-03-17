@@ -11,16 +11,21 @@ import java.util.HashMap;
 import org.apache.commons.lang3.text.WordUtils;
 
 public class ProcessRequests {
+	static File txtToWrite = new File(System.getProperty("user.home") + "\\IPNET"
+			+ ("\\ipnetCode" + new Date().toString().trim().replaceAll(" ", "_").replaceAll(":", "_") + ".txt"));
+	static BufferedWriter bw = null;
 	public static void generateCode(HashMap<String, String> map, ArrayList<String> fields) throws IOException {
 		StringBuffer buffer = new StringBuffer();
-		String thisnewOne;
 		ArrayList<String> fieldsReverse = new ArrayList<String>();
+		FileWriter fw = new FileWriter(txtToWrite);
+		bw = new BufferedWriter(fw);
+		txtToWrite.createNewFile();
 		
 		generateReportToExport(fields, buffer);
 		buffer = new StringBuffer();
 		findAllForMonthReport(map, fields, buffer, fieldsReverse);
 		dto(fieldsReverse);
-		
+		bw.flush();
 		
 	}
 
@@ -35,7 +40,7 @@ public class ProcessRequests {
 		}
 		// Gerar o DTO
 		buffer.append("\n\n");
-		thisnewOne = "dataCell = dataRow.createCell(dataRow.getLastCellNum());\n dataCell.setCellValue(reportScheduleDTO.";
+		thisnewOne = "dataCell = dataRow.createCell(dataRow.getLastCellNum());\ndataCell.setCellValue(reportScheduleDTO.";
 		for(String x : fieldsReverse){
 			x = Character.toUpperCase(x.charAt(0)) + x.substring(1);
 			String aux = "get"+ x+"());\n";
@@ -119,7 +124,7 @@ public class ProcessRequests {
 		buffer.append(";");
 		buffer.append("\n\n");
 		
-		buffer.append("query.setParameter(0, new Date(start.getTime()));\n query.setParameter(1, new Date(end.getTime()));\nquery.setFirstResult(offset);\nquery.setMaxResults(limit);\nquery.setResultTransformer(Transformers.aliasToBean(ReportScheduleDTO.class));\nreturn query.list();\"");
+		buffer.append("query.setParameter(0, new Date(start.getTime()));\nquery.setParameter(1, new Date(end.getTime()));\nquery.setFirstResult(offset);\nquery.setMaxResults(limit);\nquery.setResultTransformer(Transformers.aliasToBean(ReportScheduleDTO.class));\nreturn query.list();");
 		buffer.append("\n\n");
 		System.out.println(buffer.toString());
 		writeToTxt(buffer);
@@ -171,20 +176,14 @@ public class ProcessRequests {
 	}
 
 	private static void writeToTxt(StringBuffer buffer) {
-
-		File txtToWrite = new File(System.getProperty("user.home") + "\\IPNET"
-				+ ("\\ipnetCode" + new Date().toString().trim().replaceAll(" ", "_").replaceAll(":", "_") + ".txt"));
-
-		FileWriter fw = null;
-		BufferedWriter bw = null;
 		try {
-			txtToWrite.createNewFile();
-			fw = new FileWriter(txtToWrite);
-			bw = new BufferedWriter(fw);
-			bw.write(buffer.toString());
-			bw.flush();
+			String updatedText = buffer.toString();
+			if(updatedText.contains("\n"))
+				updatedText = updatedText.replaceAll("\n", System.lineSeparator());
+			bw.write(updatedText);
 		} catch (IOException e) {
 			e.printStackTrace();
+			
 		}
 
 	}
