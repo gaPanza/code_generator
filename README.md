@@ -9,5 +9,5 @@ IPNET View Generator
 6 - Copiar o código gerado na parte do código respectiva.
 
 
---- Baseado em campos customizáveis, gera código para 4 métodos do projeto---
+--- Baseado em campos customizáveis, gera código para 4 métodos do projeto
 --- Após copiar o código, basta verificar e fazer pequenas alterações---
